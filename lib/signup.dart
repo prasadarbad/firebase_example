@@ -14,7 +14,7 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final _auth = FirebaseAuth.instance;
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-  String? _email, _password;
+  String _email = "", _password = "";
 
   checkAuthentication() async {
     _auth.authStateChanges().listen((user) {
@@ -31,12 +31,23 @@ class _SignUpState extends State<SignUp> {
     this.checkAuthentication();
   }
 
-  SignUp() {
-    if (_formkey.currentState!.validate()) {
-      _formkey.currentState!.save();
+  signUp() async {
+    print("signup method");
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _email,
+        password: _password,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
     }
-    _auth.signInWithEmailAndPassword(
-        email: _email as String, password: _password as String);
   }
 
   showError(String errormessage) {
@@ -65,7 +76,7 @@ class _SignUpState extends State<SignUp> {
               Container(
                 height: 400,
                 child: const Image(
-                  image: AssetImage("assets/images/farrmer.png"),
+                  image: AssetImage("assets/images/farmer1.png"),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -114,15 +125,16 @@ class _SignUpState extends State<SignUp> {
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () {
-                          _auth.createUserWithEmailAndPassword(
-                              email: _email as String,
-                              password: _password as String);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomePage()));
-                        },
+                        onPressed: signUp,
+
+                        // _auth.createUserWithEmailAndPassword(
+                        //     email: _email as String,
+                        //     password: _password as String);
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => const HomePage()));
+
                         child: const Text(
                           'Sign Up',
                           style: TextStyle(
