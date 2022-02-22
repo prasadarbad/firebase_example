@@ -1,3 +1,4 @@
+import 'package:firebase_example/homepage1.dart';
 import 'package:firebase_example/signup.dart';
 import 'package:firebase_example/start.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class _LoginState extends State<Login> {
     _auth.authStateChanges().listen((user) {
       if (user != null) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomePage()));
+            context, MaterialPageRoute(builder: (context) => AddData()));
       }
     });
     @override
@@ -78,7 +79,7 @@ class _LoginState extends State<Login> {
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return HomePage();
+                return AddData();
               } else {
                 return SingleChildScrollView(
                   child: Container(
