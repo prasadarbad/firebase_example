@@ -1,6 +1,8 @@
 import 'package:firebase_example/homepage.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_example/login.dart';
+import 'package:firebase_example/signup.dart';
 import 'package:firebase_example/start.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.orange,
       ),
-      home: Start(),
+      home: SignUp(),
     );
   }
 }
