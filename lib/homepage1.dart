@@ -2,8 +2,6 @@ import 'package:firebase_example/login.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_example/signup.dart';
 
 class AddData extends StatefulWidget {
   @override
@@ -56,11 +54,55 @@ class _AddDataState extends State<AddData> {
               );
             } else {
               var data1 = snapshot.data!.data() as Map<String, dynamic>;
-              return Container(
-                child: Center(
-                  child: Text((data1)["email"]),
-                ),
+              return ListView(
+                padding: const EdgeInsets.all(8),
+                children: <Widget>[
+                  Container(
+                    height: 50,
+                    color: Colors.amber[600],
+                    child: Center(
+                      child: Text((data1)["email"]),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    height: 50,
+                    color: Colors.amber[600],
+                    child: Center(
+                      child: Text((data1)["name"]),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    height: 50,
+                    color: Colors.amber[600],
+                    child: Center(
+                      child: Text((data1)["cellNo"]),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    height: 50,
+                    color: Colors.amber[600],
+                    child: Center(
+                      child: Text((data1)["faxNo"]),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    height: 50,
+                    color: Colors.amber[600],
+                    child: Center(
+                      child: Text((data1)["tellNo"]),
+                    ),
+                  ),
+                ],
               );
+              // Container(
+              //   child: Center(
+              //     child: Text((data1)["email"]),
+              //   ),
+              // );
             }
           }
           // StreamBuilder(

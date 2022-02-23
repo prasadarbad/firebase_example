@@ -44,8 +44,8 @@ class _LoginState extends State<Login> {
   login1() {
     if (_formkey.currentState!.validate()) {
       _formkey.currentState!.save();
-      login();
     }
+    login();
   }
 
   login() async {

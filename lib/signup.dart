@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_example/HomePage.dart';
 import 'package:firebase_example/login.dart';
+import 'package:string_validator/string_validator.dart';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -41,6 +42,9 @@ class _SignUpState extends State<SignUp> {
 
   signUp() async {
     print("signup method");
+    if (_formkey.currentState!.validate()) {
+      _formkey.currentState!.save();
+    }
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -70,12 +74,13 @@ class _SignUpState extends State<SignUp> {
         await users.doc(user!.uid).set({
           "name": _name,
           "cellNo": _cellno,
-          "email": user.email,
+          "email": _email,
           "faxNo": _faxno,
           "tellNo": _telno,
           "uid": user.uid,
         });
       } catch (e) {
+        print("error");
         print(e);
       }
     }
@@ -102,16 +107,23 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "NAB",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Container(
           child: Column(
             children: <Widget>[
               SizedBox(height: 15),
               Container(
-                height: 400,
+                height: 200,
                 child: const Image(
-                  image: AssetImage("assets/images/farmer1.png"),
-                  fit: BoxFit.cover,
+                  image: AssetImage("assets/images/nablogo.jpg"),
+                  fit: BoxFit.contain,
                 ),
               ),
               Container(
@@ -122,7 +134,12 @@ class _SignUpState extends State<SignUp> {
                       Container(
                         child: TextFormField(
                           validator: (input) {
-                            if (input!.isEmpty) return 'Enter Name';
+                            if (input!.isEmpty) {
+                              return 'Enter Name';
+                            }
+                            if (!RegExp(r'[A-Z]').hasMatch(input)) {
+                              return 'Enter valid name';
+                            }
                           },
                           decoration: const InputDecoration(
                             labelText: 'Name',
@@ -140,7 +157,9 @@ class _SignUpState extends State<SignUp> {
                       Container(
                         child: TextFormField(
                           validator: (input) {
-                            if (input!.isEmpty) return 'Enter Cell no';
+                            if (input!.isEmpty) {
+                              return 'Enter Cell no';
+                            }
                           },
                           decoration: const InputDecoration(
                             labelText: 'Cell no ',
@@ -149,7 +168,7 @@ class _SignUpState extends State<SignUp> {
                           onChanged: (value) {
                             setState(
                               () {
-                                _name = value;
+                                _cellno = value;
                               },
                             );
                           },
@@ -158,7 +177,12 @@ class _SignUpState extends State<SignUp> {
                       Container(
                         child: TextFormField(
                           validator: (input) {
-                            if (input!.isEmpty) return 'Enter Email';
+                            if (input!.isEmpty) {
+                              return 'Enter Email';
+                            }
+                            if (!RegExp(r'\S+@\S+\.\S+').hasMatch(input)) {
+                              return 'Please enter a valid email address';
+                            }
                           },
                           decoration: const InputDecoration(
                             labelText: 'Email',
