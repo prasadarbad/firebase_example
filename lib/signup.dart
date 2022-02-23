@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_example/HomePage.dart';
+import 'package:firebase_example/login.dart';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -64,17 +65,22 @@ class _SignUpState extends State<SignUp> {
     var db = FirebaseFirestore.instance.collection("contactperson");
     CollectionReference users =
         FirebaseFirestore.instance.collection('contactperson');
-    Future<void> addUser() {
-      return users.doc(user!.uid).set({
-        "name": _name,
-        "cellNo": _cellno,
-        "email": user.email,
-        "faxNo": _faxno,
-        "tellNo": _telno,
-        "uid": user.uid,
-      });
+    Future<void> addUser() async {
+      try {
+        await users.doc(user!.uid).set({
+          "name": _name,
+          "cellNo": _cellno,
+          "email": user.email,
+          "faxNo": _faxno,
+          "tellNo": _telno,
+          "uid": user.uid,
+        });
+      } catch (e) {
+        print(e);
+      }
     }
 
+    await addUser();
     Navigator.push(context, MaterialPageRoute(builder: (context) => AddData()));
   }
 
@@ -237,6 +243,18 @@ class _SignUpState extends State<SignUp> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                      ),
+                      SizedBox(height: 20),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          textStyle: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => Login()));
+                        },
+                        child: const Text('Already an Account? Sign in'),
                       ),
                     ],
                   ),

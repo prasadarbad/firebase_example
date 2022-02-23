@@ -1,3 +1,4 @@
+import 'package:firebase_example/login.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,8 +11,14 @@ class AddData extends StatefulWidget {
 }
 
 class _AddDataState extends State<AddData> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   User? user = FirebaseAuth.instance.currentUser;
   var db = FirebaseFirestore.instance.collection("contactperson");
+
+  signOut() {
+    _auth.signOut();
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+  }
 
   @override
   void initState() {
@@ -25,8 +32,16 @@ class _AddDataState extends State<AddData> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green,
-        title: Text("NBA"),
+        title: Text("NAB"),
+        actions: <Widget>[
+          TextButton(
+            onPressed: signOut,
+            child: Text(
+              "Logout",
+              style: TextStyle(color: Colors.black.withOpacity(0.8)),
+            ),
+          ),
+        ],
       ),
       body: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance
@@ -39,14 +54,12 @@ class _AddDataState extends State<AddData> {
               return const Center(
                 child: CircularProgressIndicator(),
               );
-            }
-
-            if (!snapshot.data!.exists) {
-              return Text("empty");
             } else {
               var data1 = snapshot.data!.data() as Map<String, dynamic>;
               return Container(
-                child: Center(child: Text((data1)["email"])),
+                child: Center(
+                  child: Text((data1)["email"]),
+                ),
               );
             }
           }

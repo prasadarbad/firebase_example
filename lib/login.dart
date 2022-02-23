@@ -60,8 +60,8 @@ class _LoginState extends State<Login> {
 
   showError(String errormessage) {
     return AlertDialog(
-      title: const Text('Error'),
-      content: const Text('Error Message'),
+      title: Text('Error'),
+      content: Text('Error Message'),
       actions: <Widget>[
         TextButton(
           onPressed: () {
@@ -101,10 +101,11 @@ class _LoginState extends State<Login> {
                                   child: TextFormField(
                                       controller: emailController,
                                       validator: (input) {
-                                        if (input!.isEmpty)
+                                        if (input!.isEmpty) {
                                           return 'Enter Email';
+                                        }
                                       },
-                                      decoration: const InputDecoration(
+                                      decoration: InputDecoration(
                                           labelText: 'Email',
                                           prefixIcon: Icon(Icons.email)),
                                       onSaved: (input) => _email = input!),
@@ -113,8 +114,9 @@ class _LoginState extends State<Login> {
                                   child: TextFormField(
                                       controller: passwordController,
                                       validator: (input) {
-                                        if (input!.length < 6)
-                                          return 'Provide Minimum 6 Character';
+                                        if (input!.length < 6) {
+                                          return "Provide Minimum 6 Character";
+                                        }
                                       },
                                       decoration: InputDecoration(
                                         labelText: 'Password',
@@ -125,7 +127,7 @@ class _LoginState extends State<Login> {
                                 ),
                                 SizedBox(height: 20),
                                 ElevatedButton(
-                                  onPressed: login,
+                                  onPressed: login1,
                                   child: const Text(
                                     'Log in',
                                     style: TextStyle(
@@ -134,6 +136,20 @@ class _LoginState extends State<Login> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
+                                ),
+                                SizedBox(height: 20),
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                    textStyle: const TextStyle(fontSize: 20),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => SignUp()));
+                                  },
+                                  child: const Text(
+                                      'Dont have an Account? Signup'),
                                 ),
                               ],
                             ),
