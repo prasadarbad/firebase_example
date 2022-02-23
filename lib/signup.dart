@@ -59,14 +59,22 @@ class _SignUpState extends State<SignUp> {
   }
 
   insertData() async {
+    FirebaseFirestore firebasefirestore = FirebaseFirestore.instance;
+    User? user = _auth.currentUser;
     var db = FirebaseFirestore.instance.collection("contactperson");
-    db.add({
-      "name": _name,
-      "cellNo": _cellno,
-      "email": _email,
-      "faxNo": _faxno,
-      "tellNo": _telno
-    });
+    CollectionReference users =
+        FirebaseFirestore.instance.collection('contactperson');
+    Future<void> addUser() {
+      return users.doc(user!.uid).set({
+        "name": _name,
+        "cellNo": _cellno,
+        "email": user.email,
+        "faxNo": _faxno,
+        "tellNo": _telno,
+        "uid": user.uid,
+      });
+    }
+
     Navigator.push(context, MaterialPageRoute(builder: (context) => AddData()));
   }
 
