@@ -19,7 +19,7 @@ class _SplashState extends State<Splash> {
   }
 
   _navigatetohome() async {
-    await Future.delayed(const Duration(milliseconds: 8500), () {});
+    await Future.delayed(const Duration(milliseconds: 3000), () {});
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -33,7 +33,7 @@ class _SplashState extends State<Splash> {
     return Scaffold(
         body: Center(
       child: Container(
-        child: Lottie.asset('assets/images/crop1.json'),
+        child: Lottie.asset('assets/images/lf30_editor_zhumd06m.json'),
       ),
     ));
   }
