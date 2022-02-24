@@ -16,6 +16,7 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  String? errorMessage;
   final _auth = FirebaseAuth.instance;
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
@@ -54,13 +55,15 @@ class _SignUpState extends State<SignUp> {
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
+        errorMessage = 'The password provided is too weak.';
       } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
+        errorMessage = 'The account already exists for that email.';
+      } else {
+        errorMessage = 'Please fill the form';
       }
-    } catch (e) {
-      print(e);
+      Fluttertoast.showToast(msg: errorMessage!);
     }
+
     insertData();
   }
 
@@ -83,6 +86,7 @@ class _SignUpState extends State<SignUp> {
           // "time": _time,
         });
       } on FirebaseAuthException catch (error) {
+        print(error.code);
         switch (error.code) {
           case "invalid-email":
             errorMessage = "Your email address appears to be malformed.";
