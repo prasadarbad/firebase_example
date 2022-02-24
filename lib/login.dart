@@ -4,6 +4,8 @@ import 'package:firebase_example/start.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_example/homepage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lottie/lottie.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -26,6 +28,8 @@ class _LoginState extends State<Login> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   String _email = "";
   String _password = "";
+  String? errorMessage;
+  bool isPasswordVisible = true;
 
   checkAuthentication() async {
     _auth.authStateChanges().listen((user) {
@@ -49,10 +53,38 @@ class _LoginState extends State<Login> {
   }
 
   login() async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+    } on FirebaseAuthException catch (error) {
+      switch (error.code) {
+        case "invalid-email":
+          errorMessage = "Your email address appears to be malformed.";
+
+          break;
+        case "wrong-password":
+          errorMessage = "Your password is wrong.";
+          break;
+        case "user-not-found":
+          errorMessage = "User with this email doesn't exist.";
+          break;
+        case "user-disabled":
+          errorMessage = "User with this email has been disabled.";
+          break;
+        case "too-many-requests":
+          errorMessage = "Too many requests";
+          break;
+        case "operation-not-allowed":
+          errorMessage = "Signing in with Email and Password is not enabled.";
+          break;
+        default:
+          errorMessage = "An undefined Error happened.";
+      }
+      Fluttertoast.showToast(msg: errorMessage!);
+      print(error.code);
+    }
   }
 
   // Navigator.push(
@@ -75,6 +107,13 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "NAB",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+          centerTitle: true,
+        ),
         body: StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
@@ -86,11 +125,9 @@ class _LoginState extends State<Login> {
                     child: Column(
                       children: <Widget>[
                         Container(
-                          height: 400,
-                          child: Image(
-                            image: AssetImage("assets/images/farming.png"),
-                            fit: BoxFit.contain,
-                          ),
+                          height: 300,
+                          child: Lottie.asset(
+                              'assets/images/82915-tree-plantation.json'),
                         ),
                         Container(
                           child: Form(
@@ -98,19 +135,39 @@ class _LoginState extends State<Login> {
                             child: Column(
                               children: <Widget>[
                                 Container(
+                                  padding: EdgeInsets.all(19),
                                   child: TextFormField(
+                                      keyboardType: TextInputType.emailAddress,
                                       controller: emailController,
                                       validator: (input) {
                                         if (input!.isEmpty) {
                                           return 'Enter Email';
                                         }
+                                        if (!RegExp(r'\S+@\S+\.\S+')
+                                            .hasMatch(input)) {
+                                          return 'Please enter a valid email address';
+                                        }
                                       },
                                       decoration: InputDecoration(
+                                          suffixIcon: IconButton(
+                                            icon: Icon(Icons.close),
+                                            onPressed: () =>
+                                                emailController.clear(),
+                                          ),
+                                          contentPadding:
+                                              const EdgeInsets.fromLTRB(
+                                                  30, 25, 20, 15),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
                                           labelText: 'Email',
-                                          prefixIcon: Icon(Icons.email)),
+                                          hintText: 'Enter Email',
+                                          prefixIcon: const Icon(Icons.email)),
                                       onSaved: (input) => _email = input!),
                                 ),
                                 Container(
+                                  padding: EdgeInsets.all(15),
                                   child: TextFormField(
                                       controller: passwordController,
                                       validator: (input) {
@@ -119,10 +176,28 @@ class _LoginState extends State<Login> {
                                         }
                                       },
                                       decoration: InputDecoration(
+                                        contentPadding:
+                                            const EdgeInsets.fromLTRB(
+                                                30, 25, 20, 15),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
                                         labelText: 'Password',
-                                        prefixIcon: Icon(Icons.lock),
+                                        hintText: 'Enter your Password',
+                                        prefixIcon: const Icon(Icons.lock),
+                                        suffixIcon: IconButton(
+                                          icon: isPasswordVisible
+                                              ? Icon(Icons.visibility)
+                                              : Icon(Icons.visibility_off),
+                                          // ? Icon(Icons.visibility_off)
+                                          // : Icon(Icons.visibility),
+                                          onPressed: () => setState(() =>
+                                              isPasswordVisible =
+                                                  !isPasswordVisible),
+                                        ),
                                       ),
-                                      obscureText: true,
+                                      obscureText: isPasswordVisible,
                                       onSaved: (input) => _password = input!),
                                 ),
                                 SizedBox(height: 20),

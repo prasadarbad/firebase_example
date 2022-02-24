@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_example/HomePage.dart';
 import 'package:firebase_example/login.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:string_validator/string_validator.dart';
 
 import 'package:flutter/material.dart';
@@ -17,13 +18,13 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final _auth = FirebaseAuth.instance;
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+
   String _email = "",
       _password = "",
       _cellno = "",
       _faxno = "",
       _name = "",
-      _telno = "",
-      _time = " ";
+      _telno = "";
 
   checkAuthentication() async {
     _auth.authStateChanges().listen((user) {
@@ -65,6 +66,7 @@ class _SignUpState extends State<SignUp> {
 
   insertData() async {
     FirebaseFirestore firebasefirestore = FirebaseFirestore.instance;
+    String? errorMessage;
     User? user = _auth.currentUser;
     var db = FirebaseFirestore.instance.collection("contactperson");
     CollectionReference users =
@@ -78,10 +80,35 @@ class _SignUpState extends State<SignUp> {
           "faxNo": _faxno,
           "tellNo": _telno,
           "uid": user.uid,
+          // "time": _time,
         });
-      } catch (e) {
-        print("error");
-        print(e);
+      } on FirebaseAuthException catch (error) {
+        switch (error.code) {
+          case "invalid-email":
+            errorMessage = "Your email address appears to be malformed.";
+
+            break;
+          case "wrong-password":
+            errorMessage = "Your password is wrong.";
+            break;
+          case "user-not-found":
+            errorMessage = "User with this email doesn't exist.";
+            break;
+
+          case "user-disabled":
+            errorMessage = "User with this email has been disabled.";
+            break;
+          case "too-many-requests":
+            errorMessage = "Too many requests";
+            break;
+          case "operation-not-allowed":
+            errorMessage = "Signing in with Email and Password is not enabled.";
+            break;
+          default:
+            errorMessage = "An undefined Error happened.";
+        }
+        Fluttertoast.showToast(msg: errorMessage!);
+        print(error.code);
       }
     }
 
@@ -127,22 +154,28 @@ class _SignUpState extends State<SignUp> {
                 ),
               ),
               Container(
+                padding: EdgeInsets.all(15),
                 child: Form(
                   key: _formkey,
                   child: Column(
                     children: <Widget>[
                       Container(
+                        padding: EdgeInsets.all(5),
                         child: TextFormField(
                           validator: (input) {
                             if (input!.isEmpty) {
                               return 'Enter Name';
                             }
-                            if (!RegExp(r'[A-Z]').hasMatch(input)) {
+                            if (!RegExp(r'[a-z A-Z]').hasMatch(input)) {
                               return 'Enter valid name';
                             }
                           },
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             labelText: 'Name',
+                            hintText: 'Enter Name',
                             prefixIcon: Icon(Icons.person),
                           ),
                           onChanged: (value) {
@@ -155,15 +188,20 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                       Container(
+                        padding: EdgeInsets.all(5),
                         child: TextFormField(
+                          keyboardType: TextInputType.phone,
                           validator: (input) {
                             if (input!.isEmpty) {
                               return 'Enter Cell no';
                             }
                           },
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             labelText: 'Cell no ',
-                            prefixIcon: Icon(Icons.phone),
+                            prefixIcon: Icon(Icons.phone_android_rounded),
                           ),
                           onChanged: (value) {
                             setState(
@@ -175,7 +213,9 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                       Container(
+                        padding: EdgeInsets.all(5),
                         child: TextFormField(
+                          keyboardType: TextInputType.emailAddress,
                           validator: (input) {
                             if (input!.isEmpty) {
                               return 'Enter Email';
@@ -184,8 +224,12 @@ class _SignUpState extends State<SignUp> {
                               return 'Please enter a valid email address';
                             }
                           },
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             labelText: 'Email',
+                            hintText: 'Enter Email',
                             prefixIcon: Icon(Icons.email),
                           ),
                           onChanged: (value) {
@@ -198,10 +242,14 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                       Container(
+                        padding: EdgeInsets.all(5),
                         child: TextFormField(
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             labelText: 'Fax no',
-                            prefixIcon: Icon(Icons.phone),
+                            prefixIcon: Icon(Icons.print),
                           ),
                           onChanged: (value) {
                             setState(
@@ -213,10 +261,15 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                       Container(
+                        padding: EdgeInsets.all(5),
                         child: TextFormField(
-                          decoration: const InputDecoration(
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             labelText: 'Enter Tel no',
-                            prefixIcon: Icon(Icons.phone_android_rounded),
+                            prefixIcon: Icon(Icons.phone),
                           ),
                           onChanged: (value) {
                             setState(
@@ -228,13 +281,18 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                       Container(
+                        padding: EdgeInsets.all(5),
                         child: TextFormField(
                           validator: (input) {
                             if (input!.length < 6)
                               return 'Provide Minimum 6 Character';
                           },
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                             labelText: 'Password',
+                            hintText: 'Enter Password',
                             prefixIcon: Icon(Icons.lock),
                           ),
                           obscureText: true,
